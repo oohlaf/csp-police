@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/oohlaf/csp-testing/internal/decode"
+	"github.com/oohlaf/csp-police/internal/decode"
 )
 
 type BrowserCspReport struct {
