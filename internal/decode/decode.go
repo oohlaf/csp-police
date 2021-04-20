@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/golang/gddo/httputil/header"
+	"github.com/rs/zerolog/log"
 )
 
 type MalformedRequest struct {
@@ -42,7 +43,7 @@ func DecodeJsonBody(w http.ResponseWriter, r *http.Request, dst interface{}) err
 			msg := "Unsupported Media Type"
 			return &MalformedRequest{status: http.StatusUnsupportedMediaType, msg: msg}
 		}
-		// fmt.Fprintf(w, "content type is %s", value)
+		log.Info().Str("Content-Type", value).Msg("")
 	}
 	// Decode supports a maximum of 1MB messages.
 	// Larger bodies return "http: request body too large" error.
@@ -51,8 +52,7 @@ func DecodeJsonBody(w http.ResponseWriter, r *http.Request, dst interface{}) err
 	// Unknown fields return "http: unknown field ..." error.
 	dec.DisallowUnknownFields()
 
-	err := dec.Decode(&dst)
-	if err != nil {
+	if err := dec.Decode(&dst); err != nil {
 		var syntaxError *json.SyntaxError
 		var unmarshalTypeError *json.UnmarshalTypeError
 
@@ -104,7 +104,7 @@ func DecodeJsonBody(w http.ResponseWriter, r *http.Request, dst interface{}) err
 			return &MalformedRequest{status: http.StatusRequestEntityTooLarge, msg: msg}
 
 		default:
-			//log.Println(err.Error())
+			log.Error().Err(err).Msg("Unknown error")
 			return err
 		}
 	}
@@ -113,8 +113,7 @@ func DecodeJsonBody(w http.ResponseWriter, r *http.Request, dst interface{}) err
 	// the destination. If the request body only contained a single JSON
 	// object this will return an io.EOF error. So if we get anything else,
 	// we know that there is additional data in the request body.
-	err = dec.Decode(&struct{}{})
-	if err != io.EOF {
+	if err := dec.Decode(&struct{}{}); err != io.EOF {
 		msg := "Request body must only contain a single JSON object"
 		return &MalformedRequest{status: http.StatusBadRequest, msg: msg}
 	}

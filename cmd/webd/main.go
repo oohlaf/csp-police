@@ -4,8 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 
-	"github.com/oohlaf/csp-police/internal/decode"
+	"csp-police/internal/config"
+	"csp-police/internal/decode"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 type BrowserCspReport struct {
@@ -29,27 +34,36 @@ type BrowserCspDocument struct {
 
 func createCspReport(w http.ResponseWriter, r *http.Request) {
 	var doc BrowserCspDocument
-	err := decode.DecodeJsonBody(w, r, &doc)
-	if err != nil {
+
+	if err := decode.DecodeJsonBody(w, r, &doc); err != nil {
 		var mr *decode.MalformedRequest
 		if errors.As(err, &mr) {
+			log.Error().Err(err).Int("status", mr.Status()).Msg("")
 			http.Error(w, mr.Error(), mr.Status())
 		} else {
-			// log.Println(err.Error())
+			log.Error().Err(err).Int("status", http.StatusInternalServerError).Msg(http.StatusText(http.StatusInternalServerError))
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 		return
 	}
-
-	fmt.Fprintf(w, "CSP-report: %+v", doc)
+	log.Info().Msgf("CSP-Report %v", doc)
 }
 
 func main() {
+	appConf := config.AppConfig()
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	if appConf.Debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/csp-report", createCspReport)
-	err := http.ListenAndServe(":8080", mux)
-	if err != nil {
-		fmt.Print(err)
+	address := fmt.Sprintf("%s:%d", appConf.Server.Hostname, appConf.Server.Port)
+	log.Info().Str("address", address).Msg("Starting server")
+
+	if err := http.ListenAndServe(address, mux); err != nil {
+		log.Fatal().Err(err).Msg("Server startup failed")
 	}
-	// log.Fatal(err)
 }
