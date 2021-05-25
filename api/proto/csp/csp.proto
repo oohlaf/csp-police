@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package csp;
+option go_package = "csp;csp";
+
+import "google/protobuf/timestamp.proto";
+
+service CspService {
+    rpc Send(SendRequest) returns(SendResponse);
+}
+
+message SendRequest {
+    google.protobuf.Timestamp timestamp = 1;
+    Param param = 2;
+    Client client = 3;
+    CspReport report = 4;
+}
+
+message Param {
+    string application = 1;
+    string version = 2;
+    string checksum = 3;
+    bool force = 4;
+}
+
+message Client {
+    string remote_address = 1;
+    string user_agent = 2;
+}
+
+message CspReport {
+    string document_uri = 1;
+    string referrer_uri = 2;
+    string violated_directive = 3;
+    string effective_directive = 4;
+    string original_policy = 5;
+    string disposition = 6;
+    string blocked_uri = 7;
+    string status_code = 8;
+    string source_uri = 9;
+    string line_number = 10;    // string to distinguish between "" and 0
+    string column_number = 11;  // string to distinguish between "" and 0
+    string script_sample = 12;
+}
+
+message SendResponse {
+}

@@ -8,13 +8,19 @@ import (
 )
 
 type appConf struct {
-	Debug  bool `env:"DEBUG,default=false"`
-	Server serverConf
+	Debug bool `env:"DEBUG,default=false"`
+	Web   webConf
+	Grpc  grpcConf
 }
 
-type serverConf struct {
-	Hostname string `env:"SERVER_HOSTNAME,default=localhost"`
-	Port int `env:"SERVER_PORT,default=9090"`
+type webConf struct {
+	Hostname string `env:"WEB_HOSTNAME,default=localhost"`
+	Port     int    `env:"WEB_PORT,default=8080"`
+}
+
+type grpcConf struct {
+	Hostname string `env:"GRPC_HOSTNAME,default=localhost"`
+	Port     int    `env:"GRPC_PORT,default=9090"`
 }
 
 func AppConfig() *appConf {
