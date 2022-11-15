@@ -6,7 +6,7 @@
 
    help           Show usage information on all targets in a Makefile.
    rm             Remove files.
-   rmdir          Remove files or directories
+   rmdir          Remove files or directories.
 .EXAMPLE
    PowerShell -ExecutionPolicy ByPass -File ./scripts/make-helper.ps1 rm file1 file2
 .EXAMPLE
