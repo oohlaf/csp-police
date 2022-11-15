@@ -27,6 +27,17 @@
                 "DEBUG": "true",
                 "GRPC_PORT": "9090"
             }
+        },
+        {
+            "name": "Launch migrate file",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "cwd": "${workspaceRoot}",
+            "program": "${workspaceRoot}/cmd/migrate/main.go",
+            "env": {
+                "DEBUG": "true",
+            }
         }
     ]
 }

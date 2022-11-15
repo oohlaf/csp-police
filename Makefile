@@ -4,12 +4,13 @@
 
 all: build  ##- Build everything.
 
-build: webd grpcd  ##- Build all programs.
+build: webd grpcd migrate  ##- Build all programs.
 
 # Source files
 SRC_CMD := $(wildcard cmd/**/*.go)
 SRC_CMD_GRPCD := $(wildcard cmd/grpcd/*.go)
 SRC_CMD_WEBD := $(wildcard cmd/webd/*.go)
+SRC_CMD_MIGRATE := $(wildcard cmd/migrate/*.go)
 SRC_INT := $(wildcard internal/**/*.go)
 SRC_PKG := $(wildcard pkg/**/*.go)
 
@@ -22,9 +23,11 @@ SOURCES := $(SRC_INT) $(SRC_PKG)
 ifeq ($(OS),Windows_NT)
 BIN_WEBD := bin/webd.exe
 BIN_GRPCD := bin/grpcd.exe
+BIN_MIGRATE := bin/migrate.exe
 else
 BIN_WEBD := bin/webd
 BIN_GRPCD := bin/grpcd
+BIN_MIGRATE := bin/migrate
 endif
 
 # OS independent binaries
@@ -60,11 +63,20 @@ webd: $(BIN_WEBD)  ##- Build webd program.
 $(BIN_WEBD): cmd/webd/main.go $(SRC_CMD_WEBD) $(SOURCES) $(API_OUT) | bin
 	$(GO_BUILD_CMD)
 
+.PHONY: migrate
+migrate: $(BIN_MIGRATE)  ##- Build migrate program.
+
+$(BIN_MIGRATE): cmd/migrate/main.go $(SRC_CMD_MIGRATE) $(SOURCES) | bin
+	$(GO_BUILD_CMD)
+
 run-grpcd: $(BIN_GRPCD)  ##- Run grpcd program.
 	$(BIN_GRPCD)
 
 run-webd: $(BIN_WEBD)  ##- Run webd program.
 	$(BIN_WEBD)
+
+run-migration: $(BIN_MIGRATE)  ##- Run migrate program.
+	$(BIN_MIGRATE)
 
 ## Generic targets
 
