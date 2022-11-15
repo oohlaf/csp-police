@@ -9,6 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
+            "cwd": "${workspaceRoot}",
             "program": "${workspaceRoot}/cmd/webd/main.go",
             "env": {
                 "DEBUG": "true",
@@ -20,6 +21,7 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
+            "cwd": "${workspaceRoot}",
             "program": "${workspaceRoot}/cmd/grpcd/main.go",
             "env": {
                 "DEBUG": "true",
