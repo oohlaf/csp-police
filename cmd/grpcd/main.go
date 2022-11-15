@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net"
 	"os"
@@ -11,6 +12,7 @@ import (
 
 	"google.golang.org/grpc"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -37,6 +39,13 @@ func main() {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 
+	log.Info().Str("driver", appConf.Db.Driver).Str("DSN", appConf.Db.DSN).Msg("Connecting to database")
+	db, err := sql.Open(appConf.Db.Driver, appConf.Db.DSN)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to open database connection")
+	}
+	defer db.Close()
+
 	address := fmt.Sprintf("%s:%d", appConf.Grpc.Hostname, appConf.Grpc.Port)
 	log.Info().Str("address", address).Msg("Starting GRPC server")
 
@@ -47,7 +56,9 @@ func main() {
 
 	s := grpc.NewServer()
 	csp.RegisterCspServiceServer(s, NewServer())
-	if err := s.Serve(lis); err != nil {
+	err := s.Serve(lis)
+	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to start GRPC server")
 	}
+	defer s.Stop()
 }

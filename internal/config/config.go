@@ -11,6 +11,7 @@ type appConf struct {
 	Debug bool `env:"DEBUG,default=false"`
 	Web   webConf
 	Grpc  grpcConf
+	Db	  dbConf
 }
 
 type webConf struct {
@@ -21,6 +22,11 @@ type webConf struct {
 type grpcConf struct {
 	Hostname string `env:"GRPC_HOSTNAME,default=localhost"`
 	Port     int    `env:"GRPC_PORT,default=9090"`
+}
+
+type dbConf struct {
+	Driver string `env:"DB_DRIVER,default=sqlite3"`
+	DSN string `env:"DB_DSN,default=file:cspreports.db"`
 }
 
 func AppConfig() *appConf {
