@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package csp;
-option go_package = "csp;csp";
+option go_package = "./;csp";
 
 import "google/protobuf/timestamp.proto";
 
